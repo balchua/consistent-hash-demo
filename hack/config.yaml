@@ -1,0 +1,12 @@
+infrastructure:
+    nodes:
+    - name: localhost:10001
+    - name: localhost:10002
+    - name: localhost:10003
+    - name: localhost:10004
+    - name: localhost:10005
+    - name: localhost:10006
+    - name: localhost:10007
+    - name: localhost:10008
+    - name: localhost:10009
+    - name: localhost:10010

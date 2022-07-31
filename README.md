@@ -1,6 +1,7 @@
 # Consistent Hash load balancer
 
 This project is a sample proof of concept on using consistent hash as a load balancer.
+This uses the awesome  projects from [consistent-hash from buraksezer/consistent](https://github.com/buraksezer/consistent) and [gofiber](https://gofiber.io/) to serve endpoints.
 
 ## Excellent articles / videos about consistent hashing
 

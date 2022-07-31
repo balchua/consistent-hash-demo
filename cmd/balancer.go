@@ -72,7 +72,7 @@ func startBalancer(cmd *cobra.Command, args []string) {
 	router := balancer.NewServer(b)
 	app := fiber.New()
 
-	app.Get("/calculate/:key", router.Pick)
+	app.Get("/pick/:key", router.Pick)
 	app.Post("/node", router.AddNode)
 	app.Delete("/node", router.RemoveNode)
 

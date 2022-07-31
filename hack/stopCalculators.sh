@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-kill $(ps aux | grep 'consistent-demo calculate' | awk '{print $2}')
+kill $(ps aux | grep 'consistent-demo simple' | awk '{print $2}')

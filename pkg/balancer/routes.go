@@ -50,3 +50,13 @@ func (lb *lbServer) AddNode(c *fiber.Ctx) error {
 	lb.chlb.AddNode(node)
 	return c.SendString(fmt.Sprintf("node: %s is added", node))
 }
+
+func (lb *lbServer) List(c *fiber.Ctx) error {
+
+	owners := lb.chlb.List()
+	jsonStr, err := json.Marshal(owners)
+	if err != nil {
+		return err
+	}
+	return c.SendString(string(jsonStr))
+}

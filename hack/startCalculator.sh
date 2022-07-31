@@ -2,5 +2,5 @@
 
 for i in {10000..10010}
 do
-nohup .././consistent-demo calculate --port $i > "/tmp/calculate.out.$i" &
+nohup .././consistent-demo simple --port $i > "/tmp/simple.out.$i" &
 done

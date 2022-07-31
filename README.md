@@ -83,4 +83,45 @@ curl --location --request DELETE 'http://localhost:3000/node/' --form 'node="loc
 The look aside load balancer frees the load balancer from proxying the request to the intended service.  This can be kept really light and should be able to serve plenty of requests.
 
 
+### Miscellaneous
 
+There is an accompanying simple service which doesn't do much, except print out whether the `previousNode` is the same as the `currentNode`
+
+To use it.
+
+``` console
+./consistent-demo simple --port 10000
+```
+
+#### Health Check
+
+The consistent hash balancer regularly performs health checks based on the list of members defined in the [config.yaml](hack/config.yaml)
+
+If it cannot reach the member, it will remove it from the consistent hash.  When it comes back online, it will add the node back to the hash.
+
+The health check is dont every `200ms`.
+
+#### Distribution
+
+To get the partition distribution for each node
+
+``` console
+curl --location --request GET 'http://localhost:3000/list'
+```
+
+Will return you the following:
+
+``` json
+{
+    "localhost:10000": 5,
+    "localhost:10001": 5,
+    "localhost:10002": 6,
+    "localhost:10003": 7,
+    "localhost:10005": 6,
+    "localhost:10006": 4,
+    "localhost:10007": 5,
+    "localhost:10008": 2,
+    "localhost:10009": 7,
+    "localhost:10010": 3
+}
+```

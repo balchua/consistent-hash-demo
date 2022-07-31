@@ -28,7 +28,7 @@ type ConsistentHashLoadBalancer struct {
 func NewBalancer(clusterConfig config.ClusterConfig) *ConsistentHashLoadBalancer {
 	// Create a new consistent instance
 	cfg := consistent.Config{
-		PartitionCount:    30,
+		PartitionCount:    50,
 		ReplicationFactor: 20,
 		Load:              1.25,
 		Hasher:            hasher{},
@@ -42,19 +42,20 @@ func NewBalancer(clusterConfig config.ClusterConfig) *ConsistentHashLoadBalancer
 		b.c.Add(clusterMember(node.Name))
 	}
 
+	go b.checkHealth(clusterConfig)
+
 	return b
 }
 
 func (b *ConsistentHashLoadBalancer) Pick(key string) (previousMember consistent.Member, currentMember consistent.Member) {
 	currentNode := b.c.LocateKey([]byte(key))
 	previous, _ := b.nodeHistory.Get(key)
-
+	if previous == nil {
+		previous = clusterMember("")
+	}
 	if previous != currentNode {
 		b.nodeHistory.Set(key, currentNode)
 		logging.Infof("Previous Member: %s , Current Member: %s", previous, currentNode)
-	}
-	if previous == nil {
-		previous = clusterMember("")
 	}
 
 	return previous, currentNode
@@ -66,4 +67,14 @@ func (b *ConsistentHashLoadBalancer) AddNode(nodeName string) {
 
 func (b *ConsistentHashLoadBalancer) RemoveNode(nodeName string) {
 	b.c.Remove(nodeName)
+}
+
+func (b *ConsistentHashLoadBalancer) List() map[string]int {
+	owners := make(map[string]int)
+	for partID := 0; partID < 50; partID++ {
+		owner := b.c.GetPartitionOwner(partID)
+		owners[owner.String()]++
+	}
+
+	return owners
 }

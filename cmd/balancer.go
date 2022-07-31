@@ -75,6 +75,7 @@ func startBalancer(cmd *cobra.Command, args []string) {
 	app.Get("/pick/:key", router.Pick)
 	app.Post("/node", router.AddNode)
 	app.Delete("/node", router.RemoveNode)
+	app.Get("/list", router.List)
 
 	if err := app.Listen(":3000"); err != nil {
 		logging.Errorf("%v", err)

@@ -1,5 +1,6 @@
 infrastructure:
     nodes:
+    - name: localhost:10000
     - name: localhost:10001
     - name: localhost:10002
     - name: localhost:10003

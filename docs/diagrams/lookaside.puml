@@ -1,0 +1,7 @@
+@startuml "Look Aside Consistent Hash LB"
+[Client]
+[Look aside Consistent LB]
+[Client] ..>[Look aside Consistent LB] : pick server
+collections services
+[Client] -> services : calls the service
+@enduml

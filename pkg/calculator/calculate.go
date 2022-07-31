@@ -25,6 +25,6 @@ func (calc *calculator) Calculate(c *fiber.Ctx) error {
 		return c.SendString(fmt.Sprintf("node %s is not the same as current host %s, clearing cache", node, currentHost))
 	}
 	// simulate calculate data
-	time.Sleep(time.Duration(20 * time.Millisecond))
+	time.Sleep(time.Duration(5 * time.Millisecond))
 	return c.SendString("same same")
 }

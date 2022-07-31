@@ -2,8 +2,10 @@ package balancer
 
 import (
 	"github.com/balchua/consistent-demo/pkg/config"
+	"github.com/balchua/consistent-demo/pkg/logging"
 	"github.com/buraksezer/consistent"
 	"github.com/cespare/xxhash"
+	cmap "github.com/orcaman/concurrent-map/v2"
 )
 
 type clusterMember string
@@ -19,7 +21,8 @@ func (h hasher) Sum64(data []byte) uint64 {
 }
 
 type ConsistentHashLoadBalancer struct {
-	c *consistent.Consistent
+	c           *consistent.Consistent
+	nodeHistory cmap.ConcurrentMap[consistent.Member]
 }
 
 func NewBalancer(clusterConfig config.ClusterConfig) *ConsistentHashLoadBalancer {
@@ -31,7 +34,8 @@ func NewBalancer(clusterConfig config.ClusterConfig) *ConsistentHashLoadBalancer
 		Hasher:            hasher{},
 	}
 	b := &ConsistentHashLoadBalancer{
-		c: consistent.New(nil, cfg),
+		c:           consistent.New(nil, cfg),
+		nodeHistory: cmap.New[consistent.Member](),
 	}
 
 	for _, node := range clusterConfig.Infra.Nodes {
@@ -41,6 +45,25 @@ func NewBalancer(clusterConfig config.ClusterConfig) *ConsistentHashLoadBalancer
 	return b
 }
 
-func (b *ConsistentHashLoadBalancer) Pick(name string) consistent.Member {
-	return b.c.LocateKey([]byte(name))
+func (b *ConsistentHashLoadBalancer) Pick(key string) (previousMember consistent.Member, currentMember consistent.Member) {
+	currentNode := b.c.LocateKey([]byte(key))
+	previous, _ := b.nodeHistory.Get(key)
+
+	if previous != currentNode {
+		b.nodeHistory.Set(key, currentNode)
+		logging.Infof("Previous Member: %s , Current Member: %s", previous, currentNode)
+	}
+	if previous == nil {
+		previous = clusterMember("")
+	}
+
+	return previous, currentNode
+}
+
+func (b *ConsistentHashLoadBalancer) AddNode(nodeName string) {
+	b.c.Add(clusterMember(nodeName))
+}
+
+func (b *ConsistentHashLoadBalancer) RemoveNode(nodeName string) {
+	b.c.Remove(nodeName)
 }
